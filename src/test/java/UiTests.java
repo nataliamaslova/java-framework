@@ -1,35 +1,49 @@
-import org.junit.jupiter.api.AfterEach;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static constants.CommonConstants.UI_BASE_URL;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-public class UiTests {
-    private WebDriver driver;
-
-    @BeforeEach
-    public void setup() {
-        driver = new ChromeDriver();
-    }
-
-    @AfterEach
-    public void tearDown() {
-        driver.quit();
-    }
+public class UiTests extends BaseTest {
 
     @Test
     public void submitWebFormTest() {
         driver.get(UI_BASE_URL);
         driver.findElement(By.linkText("Web form")).click();
         driver.findElement(By.id("my-text-id")).sendKeys("Text");
-        driver.findElement(By.xpath("//button[@type = 'submit']")).click();
+        WebElement button = driver.findElement(By.xpath("//button[@type = 'submit']"));
+        button.click();
         WebElement title = driver.findElement(By.className("display-6"));
 
         Assertions.assertEquals("Form submitted", title.getText());
+    }
+
+    @Test
+    void loadingImagesImplicitWaitTest() {
+        driver.get("https://bonigarcia.dev/selenium-webdriver-java/loading-images.html");
+
+        WebElement compass = driver.findElement(By.id("compass"));
+        WebElement calendar = driver.findElement(By.id("calendar"));
+        WebElement award = driver.findElement(By.id("award"));
+        WebElement landscape = driver.findElement(By.id("landscape"));
+
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(compass.getAttribute("src")).containsIgnoringCase("compass");
+        softly.assertThat(calendar.getAttribute("src")).containsIgnoringCase("calendar");
+        softly.assertThat(award.getAttribute("src")).containsIgnoringCase("award");
+        softly.assertThat(landscape.getAttribute("src")).containsIgnoringCase("landscape");
+        softly.assertAll();
+    }
+
+    @Test
+    void loadingImagesExplicitWaitTest() {
+        driver.get("https://bonigarcia.dev/selenium-webdriver-java/loading-images.html");
+
+        WebElement landscape = longWait.until(ExpectedConditions.presenceOfElementLocated(By.id("landscape")));
+        assertThat(landscape.getAttribute("src")).containsIgnoringCase("landscape");
     }
 }
