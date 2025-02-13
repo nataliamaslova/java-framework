@@ -1,30 +1,32 @@
 import controllers.UserController;
 import io.restassured.response.Response;
 import models.AddUserResponse;
-import models.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static constants.CommonConstants.BASE_URI;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 import static io.restassured.RestAssured.given;
+import static testdata.TestData.DEFAULT_USER;
+import static testdata.TestData.INVALID_USER;
 
 public class SmokeApiTests {
     UserController userController = new UserController();
 
-    private static String baseUrl = "https://petstore.swagger.io/v2/";
-    private static String body = """
-            {
-              "id": 0,
-              "username": "string",
-              "firstName": "string",
-              "lastName": "string",
-              "email": "string",
-              "password": "string",
-              "phone": "string",
-              "userStatus": 0
-            }
-            """;
+//    private static String body = """
+//            {
+//              "id": 0,
+//              "username": "string",
+//              "firstName": "string",
+//              "lastName": "string",
+//              "email": "string",
+//              "password": "string",
+//              "phone": "string",
+//              "userStatus": 0
+//            }
+//            """;
 
     @Test
     public void simpleTest() {
@@ -33,8 +35,8 @@ public class SmokeApiTests {
         Response response = given()
                         .header("accept", "application/json")
                         .header("Content-Type", " application/json")
-                        .baseUri(baseUrl)
-                        .body(body)
+                        .baseUri(BASE_URI)
+                        .body(DEFAULT_USER)
                 .when()
                         .post("user")
                     .andReturn();
@@ -49,8 +51,8 @@ public class SmokeApiTests {
         given()
                 .header("accept", "application/json")
                 .header("Content-Type", " application/json")
-                .baseUri(baseUrl)
-                .body(body)
+                .baseUri(BASE_URI)
+                .body(DEFAULT_USER)
             .when()
                 .post("user")
             .then()
@@ -62,24 +64,18 @@ public class SmokeApiTests {
 
     @Test
     void createUserControllerTest() {
-        User user = new User(0,
-                "username",
-                "firstName",
-                "lastName",
-                "email",
-                "password",
-                "phone",
-                0);
-        User userBuilder = User.builder()
-                .username("username")
-                .firstName("firstName")
-                .lastName("lastName")
-                .email("email")
-                .phone("password")
-                .userStatus(0)
-                .build();
+        Response response = userController.createDefaultUser();
+        AddUserResponse createdUserResponse = response.as(AddUserResponse.class);
 
-        Response response = userController.createUser(user);
+        Assertions.assertEquals(200, response.statusCode());
+        Assertions.assertEquals(200, createdUserResponse.getCode());
+        Assertions.assertEquals("unknown", createdUserResponse.getType());
+        Assertions.assertFalse(createdUserResponse.getMessage().isEmpty());
+    }
+
+    @Test
+    void createUserControllerTest2() {
+        Response response = userController.createDefaultUser(INVALID_USER);
         AddUserResponse createdUserResponse = response.as(AddUserResponse.class);
 
         Assertions.assertEquals(200, response.statusCode());
