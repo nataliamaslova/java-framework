@@ -1,14 +1,23 @@
+package tests;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import utils.AfterTestExtension;
 
 import java.time.Duration;
 
+@ExtendWith(AfterTestExtension.class)
 public class BaseTest {
-    protected WebDriver driver;
+    static WebDriver driver;
     protected WebDriverWait longWait;
+
+    public static WebDriver getDriver() {
+        return driver;
+    }
 
     @BeforeEach
     public void setup() {
@@ -21,5 +30,4 @@ public class BaseTest {
     public void tearDown() {
         driver.quit();
     }
-
 }

@@ -1,3 +1,5 @@
+package tests;
+
 import controllers.UserController;
 import io.restassured.response.Response;
 import models.AddUserResponse;
@@ -80,7 +82,7 @@ public class SmokeApiTests {
 
     @Test
     void createInvalidUserControllerTest() {
-        Response response = userController.createDefaultUser(INVALID_USER);
+        Response response = userController.createUser(INVALID_USER);
         AddUserResponse createdUserResponse = response.as(AddUserResponse.class);
 
         Assertions.assertEquals(200, response.statusCode());
@@ -96,7 +98,7 @@ public class SmokeApiTests {
     @ParameterizedTest
     @MethodSource("users")
     public void createUserParametrizedTest(User user) {
-        Response response = userController.createDefaultUser();
+        Response response = userController.createUser(user);
         AddUserResponse createdUserResponse = response.as(AddUserResponse.class);
 
         Assertions.assertEquals(200, response.statusCode());
