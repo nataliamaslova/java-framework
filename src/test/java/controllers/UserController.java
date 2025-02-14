@@ -1,12 +1,13 @@
 package controllers;
 
 import config.TestPropertiesConfig;
+import io.qameta.allure.Step;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import models.User;
 import org.aeonbits.owner.ConfigFactory;
 
-import static constants.CommonConstants.BASE_URI;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static testdata.TestData.DEFAULT_USER;
@@ -20,9 +21,11 @@ public class UserController {
         this.requestSpecification = given()
                 .accept(JSON)
                 .contentType(JSON)
-                .baseUri(configProperties.getApiBaseUrl());
+                .baseUri(configProperties.getApiBaseUrl())
+                .filter(new AllureRestAssured());
     }
 
+    @Step("Create default user")
     public Response createDefaultUser() {
         return given(this.requestSpecification)
                     .body(DEFAULT_USER)
@@ -31,7 +34,8 @@ public class UserController {
                     .andReturn();
     }
 
-    public Response createDefaultUser(User user) {
+    @Step("Create user")
+    public Response createUser(User user) {
         return given(this.requestSpecification)
                 .body(user)
                 .when()
